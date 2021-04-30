@@ -24,6 +24,11 @@ class PokemonsController < ApplicationController
     end
   end
 
+  def index
+    @pokemons = Pokemon.all
+    render json: @pokemons
+  end
+
   def destroy
     @pokemon = Pokemon.find(params[:id])
     unless @pokemon.nil?
