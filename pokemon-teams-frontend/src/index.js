@@ -26,10 +26,12 @@ fetch('http://127.0.0.1:3000/trainers')
             })
 
         trainerCard.append(detH3, addBttn);
-        
             let pokeUl = document.createElement('ul');
                 pokeUl.dataset.id = trainerObj.id;
                 pokeUl.classList.add('pokemonList');
+                pokeUl.addEventListener('click', evt =>{
+                    rlsPokemon(evt)
+                })
                 trainerCard.append(pokeUl);
                 
             const pokeArr = trainerObj.pokemons
@@ -40,11 +42,10 @@ fetch('http://127.0.0.1:3000/trainers')
                         pokeUl.append(pokeLi);
                 }) 
         mainBody.append(trainerCard);
-
     }
 
 function addPokemon(trainerObj){
-    if(trainerObj.pokemons.length < 6){
+    if(trainerObj.pokemons.length <= 5){
         fetch('http://localhost:3000/pokemons', {
             method: "POST",
             headers: {
@@ -54,6 +55,30 @@ function addPokemon(trainerObj){
             body: JSON.stringify({trainer_id: trainerObj.id})
         })
         .then(res => res.json())
+        .then(pokeMon => {
+            const pokeLi = document.createElement('li')
+                pokeLi.innerHTML = `${pokeMon.nickname} (${pokeMon.species})<button class="release" data-pokemon-id="${pokeMon.id}">Release</button>
+                `
+                let pokeUl = document.querySelector(`ul[data-id="${trainerObj.id}"]`)
+                pokeUl.append(pokeLi);
+        }) 
+    } else {
+        console.log("Party is Full!") 
+    }
+}
+
+function rlsPokemon(evt){
+    if(evt.target.matches('button.release')){
+        // console.log(evt.target.dataset.pokemonId)
+        let liToRemove = document.querySelector(`[data-pokemon-id="${evt.target.dataset.pokemonId}"]`).parentElement
+
+        console.log(liToRemove)
+        liToRemove.remove()
+        fetch(`http://localhost:3000/pokemons/${evt.target.dataset.pokemonId}`, {
+            method:"DELETE"
+        })
+        .then(res => res.json)
         .then(console.log)
     }
 }
+
